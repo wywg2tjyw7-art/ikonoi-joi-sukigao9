@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>イコノイジョイ 好き顔♡9選</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:linear-gradient(135deg,#fff0f7,#f4efff);color:#6b4660}
+main{width:min(680px,100%);margin:auto;padding:18px 14px 42px}
+.card{background:rgba(255,255,255,.95);border:2px solid #fff;border-radius:30px;padding:24px 16px;box-shadow:0 14px 38px rgba(160,90,140,.16);text-align:center}
+h1{color:#b84d84;font-size:30px;line-height:1.25;margin:8px 0 14px}
+h2{color:#a34d7a;font-size:20px;margin:8px 0}
+.sub{font-size:13px;color:#a47b96;line-height:1.65}
+button{border:0;border-radius:999px;padding:14px 22px;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(90deg,#ff91bd,#b99bff);box-shadow:0 7px 16px rgba(180,105,150,.2);cursor:pointer}
+button:active{transform:scale(.98)}
+.hidden{display:none!important}
+.progress{height:8px;background:#f3dce8;border-radius:99px;overflow:hidden;margin:16px 0 20px}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff8fbc,#b69cff);transition:.25s}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{padding:8px;background:#fff;border:2px solid #f2c9dc;border-radius:22px;color:#6d4560;box-shadow:0 5px 13px rgba(170,100,145,.08)}
+.choice img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-radius:16px;background:#fdebf4}
+.name{font-weight:900;font-size:15px;margin-top:8px}
+.group{font-size:11px;color:#ad809a;margin-top:3px}
+.photo-wrap{position:relative}
+.heart{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.88);display:grid;place-items:center;color:#d95d94;font-size:19px}
+.result{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}
+.item{background:#fff1f7;border:1px solid #f3cbdc;border-radius:15px;padding:8px}
+.item img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block;background:#fdebf4}
+.rank{font-weight:900;color:#c34e88;font-size:13px;margin-bottom:4px}
+.item .name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.note{font-size:11px;color:#ad879d;line-height:1.6;margin-top:15px}
+.loader{padding:30px 0;color:#a47b96}
+@media(max-width:420px){h1{font-size:27px}.choices{gap:9px}.choice{padding:6px;border-radius:18px}.choice img{border-radius:13px}}
+</style>
+</head>
+<body>
+<main>
+<section id="start" class="card">
+<div style="font-size:46px">🎀💗🎀</div>
+<h1>イコノイジョイ<br>好き顔♡9選</h1>
+<p class="sub">＝LOVE・≠ME・≒JOYの33人から<br>あなたの「好き顔」を9人選ぼう♡</p>
+<p>2人の写真を見比べて、<br><b>直感で好きなほうをタップ！</b></p>
+<button id="startBtn">好き顔選びをはじめる♡</button>
+<p class="note">2026年9月時点の現行メンバーを対象♡<br>写真は各グループ公式プロフィール画像を表示しています。</p>
+</section>
+
+<section id="game" class="card hidden">
+<div class="sub" id="round"></div>
+<div class="progress"><span id="bar"></span></div>
+<h2>どっちの顔が好き？♡</h2>
+<div class="choices" id="choices"></div>
+<p class="note">考えすぎず、第一印象で選んでね♡</p>
+</section>
+
+<section id="result" class="card hidden">
+<div style="font-size:42px">🎉💗🎉</div>
+<h1>あなたの<br>好き顔♡9選</h1>
+<p class="sub">100回の対決からTOP9を決定♡</p>
+<div class="result" id="resultList"></div>
+<div class="actions">
+<button id="again">もう一回遊ぶ♡</button>
+<button id="share">結果をシェア♡</button>
+</div>
+<p class="note">スマホならスクショしてXなどでシェアしてね♡</p>
+</section>
+</main>
+
+<script>
+const members=[["＝LOVE", "大谷映美里", "https://equal-love.jp/image/profile/otani_emiri.jpg"], ["＝LOVE", "大場花菜", "https://equal-love.jp/image/profile/oba_hana.jpg"], ["＝LOVE", "音嶋莉沙", "https://equal-love.jp/image/profile/otoshima_risa.jpg"], ["＝LOVE", "齋藤樹愛羅", "https://equal-love.jp/image/profile/saito_kiara.jpg"], ["＝LOVE", "佐々木舞香", "https://equal-love.jp/image/profile/sasaki_maika.jpg"], ["＝LOVE", "髙松瞳", "https://equal-love.jp/image/profile/takamatsu_hitomi.jpg"], ["＝LOVE", "瀧脇笙古", "https://equal-love.jp/image/profile/takiwaki_shoko.jpg"], ["＝LOVE", "野口衣織", "https://equal-love.jp/image/profile/noguchi_iori.jpg"], ["＝LOVE", "諸橋沙夏", "https://equal-love.jp/image/profile/morohashi_sana.jpg"], ["＝LOVE", "山本杏奈", "https://equal-love.jp/image/profile/yamamoto_anna.jpg"], ["≠ME", "尾木波菜", "https://not-equal-me.jp/image/profile/ogi_hana.jpg"], ["≠ME", "落合希来里", "https://not-equal-me.jp/image/profile/ochiai_kirari.jpg"], ["≠ME", "蟹沢萌子", "https://not-equal-me.jp/image/profile/kanisawa_moeko.jpg"], ["≠ME", "河口夏音", "https://not-equal-me.jp/image/profile/kawaguchi_natsune.jpg"], ["≠ME", "川中子奈月心", "https://not-equal-me.jp/image/profile/kawanago_natsumi.jpg"], ["≠ME", "櫻井もも", "https://not-equal-me.jp/image/profile/sakurai_momo.jpg"], ["≠ME", "鈴木瞳美", "https://not-equal-me.jp/image/profile/suzuki_hitomi.jpg"], ["≠ME", "谷崎早耶", "https://not-equal-me.jp/image/profile/tanizaki_saya.jpg"], ["≠ME", "冨田菜々風", "https://not-equal-me.jp/image/profile/tomita_nanaka.jpg"], ["≠ME", "永田詩央里", "https://not-equal-me.jp/image/profile/nagata_shiori.jpg"], ["≠ME", "本田珠由記", "https://not-equal-me.jp/image/profile/honda_miyuki.jpg"], ["≒JOY", "逢田珠里依", "https://nearly-equal-joy.jp/image/profile/aida_jurii.jpg"], ["≒JOY", "天野香乃愛", "https://nearly-equal-joy.jp/image/profile/amano_konoa.jpg"], ["≒JOY", "市原愛弓", "https://nearly-equal-joy.jp/image/profile/ichihara_ayumi.jpg"], ["≒JOY", "江角怜音", "https://nearly-equal-joy.jp/image/profile/esumi_renon.jpg"], ["≒JOY", "大信田美月", "https://nearly-equal-joy.jp/image/profile/oshida_mitsuki.jpg"], ["≒JOY", "大西葵", "https://nearly-equal-joy.jp/image/profile/onishi_aoi.jpg"], ["≒JOY", "小澤愛実", "https://nearly-equal-joy.jp/image/profile/ozawa_aimi.jpg"], ["≒JOY", "髙橋舞", "https://nearly-equal-joy.jp/image/profile/takahashi_mai.jpg"], ["≒JOY", "藤沢莉子", "https://nearly-equal-joy.jp/image/profile/fujisawa_riko.jpg"], ["≒JOY", "村山結香", "https://nearly-equal-joy.jp/image/profile/murayama_yuuka.jpg"], ["≒JOY", "山田杏佳", "https://nearly-equal-joy.jp/image/profile/yamada_momoka.jpg"], ["≒JOY", "山野愛月", "https://nearly-equal-joy.jp/image/profile/yamano_arisu.jpg"]];
+const TOTAL=100;
+let round=0,wins=[],lastPair="";
+
+const $=id=>document.getElementById(id);
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+
+function start(){
+  round=0; wins=[]; lastPair="";
+  $("start").classList.add("hidden");
+  $("result").classList.add("hidden");
+  $("game").classList.remove("hidden");
+  next();
+}
+
+function pickPair(){
+  let a,b,key;
+  let guard=0;
+  do{
+    a=members[Math.floor(Math.random()*members.length)];
+    b=members[Math.floor(Math.random()*members.length)];
+    key=[a[1],b[1]].sort().join("|");
+    guard++;
+  }while((a[1]===b[1] || key===lastPair) && guard<100);
+  lastPair=key;
+  return shuffle([a,b]);
+}
+
+function next(){
+  if(round>=TOTAL){finish();return;}
+  round++;
+  $("round").textContent=`第 ${round} / ${TOTAL} 回`;
+  $("bar").style.width=(round/TOTAL*100)+"%";
+  $("choices").innerHTML="";
+  pickPair().forEach(m=>{
+    const btn=document.createElement("button");
+    btn.className="choice";
+    btn.innerHTML=`
+      <div class="photo-wrap">
+        <img src="${m[2]}" alt="${m[1]}" loading="eager">
+        <div class="heart">♡</div>
+      </div>
+      <div class="name">${m[1]}</div>
+      <div class="group">${m[0]}</div>`;
+    btn.onclick=()=>{wins.push(m);next();};
+    $("choices").appendChild(btn);
+  });
+}
+
+function finish(){
+  $("game").classList.add("hidden");
+  $("result").classList.remove("hidden");
+  const count={};
+  wins.forEach(m=>count[m[1]]=(count[m[1]]||0)+1);
+  const ranked=members
+    .map(m=>({group:m[0],name:m[1],src:m[2],score:count[m[1]]||0}))
+    .sort((a,b)=>b.score-a.score || Math.random()-.5)
+    .slice(0,9);
+
+  $("resultList").innerHTML="";
+  ranked.forEach((m,i)=>{
+    const el=document.createElement("div");
+    el.className="item";
+    el.innerHTML=`
+      <div class="rank">${i+1}位</div>
+      <img src="${m.src}" alt="${m.name}" loading="lazy">
+      <div class="name">${m.name}</div>
+      <div class="group">${m.group}</div>`;
+    $("resultList").appendChild(el);
+  });
+}
+
+$("startBtn").onclick=start;
+$("again").onclick=start;
+$("share").onclick=async()=>{
+  const text="私のイコノイジョイ好き顔♡9選が決まった！";
+  if(navigator.share){
+    try{await navigator.share({title:"イコノイジョイ 好き顔♡9選",text:text});}catch(e){}
+  }else{
+    try{await navigator.clipboard.writeText(text);alert("シェア文をコピーしたよ♡ 結果はスクショしてXへ！");}
+    catch(e){alert("結果をスクショしてXでシェアしてね♡");}
+  }
+};
+</script>
+</body>
+</html>
