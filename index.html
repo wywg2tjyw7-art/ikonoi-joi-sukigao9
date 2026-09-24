@@ -30,7 +30,7 @@ button:active{transform:scale(.98)}
 .rank{font-weight:900;color:#c34e88;font-size:13px;margin-bottom:4px}
 .item .name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.note{font-size:11px;color:#ad879d;line-height:1.6;margin-top:15px}
+.note{font-size:11px;color:#ad879d;line-height:1.6;margin-top:15px}.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:14px}.controls button{padding:10px 5px;font-size:12px;background:#fff;color:#a6537e;border:1px solid #f0c6da;box-shadow:none}.controls button:disabled{opacity:.45}.xbtn{background:#111!important;color:#fff!important;border:0!important}
 .loader{padding:30px 0;color:#a47b96}
 @media(max-width:420px){h1{font-size:27px}.choices{gap:9px}.choice{padding:6px;border-radius:18px}.choice img{border-radius:13px}}
 </style>
@@ -51,6 +51,7 @@ button:active{transform:scale(.98)}
 <div class="progress"><span id="bar"></span></div>
 <h2>どっちの顔が好き？♡</h2>
 <div class="choices" id="choices"></div>
+<div class="controls"><button id="backBtn" disabled>← 1つ前に戻る</button><button id="bothBtn">♡ どっちも好き</button><button id="unknownBtn">？ わからない</button></div>
 <p class="note">考えすぎず、第一印象で選んでね♡</p>
 </section>
 
@@ -61,7 +62,7 @@ button:active{transform:scale(.98)}
 <div class="result" id="resultList"></div>
 <div class="actions">
 <button id="again">もう一回遊ぶ♡</button>
-<button id="share">結果をシェア♡</button>
+<button id="share" class="xbtn">𝕏 結果をXで共有♡</button>
 </div>
 <p class="note">スマホならスクショしてXなどでシェアしてね♡</p>
 </section>
@@ -70,22 +71,22 @@ button:active{transform:scale(.98)}
 <script>
 const members=[["＝LOVE", "大谷映美里", "https://equal-love.jp/image/profile/otani_emiri.jpg"], ["＝LOVE", "大場花菜", "https://equal-love.jp/image/profile/oba_hana.jpg"], ["＝LOVE", "音嶋莉沙", "https://equal-love.jp/image/profile/otoshima_risa.jpg"], ["＝LOVE", "齋藤樹愛羅", "https://equal-love.jp/image/profile/saito_kiara.jpg"], ["＝LOVE", "佐々木舞香", "https://equal-love.jp/image/profile/sasaki_maika.jpg"], ["＝LOVE", "髙松瞳", "https://equal-love.jp/image/profile/takamatsu_hitomi.jpg"], ["＝LOVE", "瀧脇笙古", "https://equal-love.jp/image/profile/takiwaki_shoko.jpg"], ["＝LOVE", "野口衣織", "https://equal-love.jp/image/profile/noguchi_iori.jpg"], ["＝LOVE", "諸橋沙夏", "https://equal-love.jp/image/profile/morohashi_sana.jpg"], ["＝LOVE", "山本杏奈", "https://equal-love.jp/image/profile/yamamoto_anna.jpg"], ["≠ME", "尾木波菜", "https://not-equal-me.jp/image/profile/ogi_hana.jpg"], ["≠ME", "落合希来里", "https://not-equal-me.jp/image/profile/ochiai_kirari.jpg"], ["≠ME", "蟹沢萌子", "https://not-equal-me.jp/image/profile/kanisawa_moeko.jpg"], ["≠ME", "河口夏音", "https://not-equal-me.jp/image/profile/kawaguchi_natsune.jpg"], ["≠ME", "川中子奈月心", "https://not-equal-me.jp/image/profile/kawanago_natsumi.jpg"], ["≠ME", "櫻井もも", "https://not-equal-me.jp/image/profile/sakurai_momo.jpg"], ["≠ME", "鈴木瞳美", "https://not-equal-me.jp/image/profile/suzuki_hitomi.jpg"], ["≠ME", "谷崎早耶", "https://not-equal-me.jp/image/profile/tanizaki_saya.jpg"], ["≠ME", "冨田菜々風", "https://not-equal-me.jp/image/profile/tomita_nanaka.jpg"], ["≠ME", "永田詩央里", "https://not-equal-me.jp/image/profile/nagata_shiori.jpg"], ["≠ME", "本田珠由記", "https://not-equal-me.jp/image/profile/honda_miyuki.jpg"], ["≒JOY", "逢田珠里依", "https://nearly-equal-joy.jp/image/profile/aida_jurii.jpg"], ["≒JOY", "天野香乃愛", "https://nearly-equal-joy.jp/image/profile/amano_konoa.jpg"], ["≒JOY", "市原愛弓", "https://nearly-equal-joy.jp/image/profile/ichihara_ayumi.jpg"], ["≒JOY", "江角怜音", "https://nearly-equal-joy.jp/image/profile/esumi_renon.jpg"], ["≒JOY", "大信田美月", "https://nearly-equal-joy.jp/image/profile/oshida_mitsuki.jpg"], ["≒JOY", "大西葵", "https://nearly-equal-joy.jp/image/profile/onishi_aoi.jpg"], ["≒JOY", "小澤愛実", "https://nearly-equal-joy.jp/image/profile/ozawa_aimi.jpg"], ["≒JOY", "髙橋舞", "https://nearly-equal-joy.jp/image/profile/takahashi_mai.jpg"], ["≒JOY", "藤沢莉子", "https://nearly-equal-joy.jp/image/profile/fujisawa_riko.jpg"], ["≒JOY", "村山結香", "https://nearly-equal-joy.jp/image/profile/murayama_yuuka.jpg"], ["≒JOY", "山田杏佳", "https://nearly-equal-joy.jp/image/profile/yamada_momoka.jpg"], ["≒JOY", "山野愛月", "https://nearly-equal-joy.jp/image/profile/yamano_arisu.jpg"]];
 const TOTAL=100;
-let round=0,wins=[],lastPair="";
+let round=0,wins=[],history=[],lastPair="",unknownCount=0,bothCount=0;
 
 const $=id=>document.getElementById(id);
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 
 function start(){
-  round=0; wins=[]; lastPair="";
+  round=0;wins=[];history=[];lastPair="";unknownCount=0;bothCount=0;
   $("start").classList.add("hidden");
   $("result").classList.add("hidden");
   $("game").classList.remove("hidden");
+  $("backBtn").disabled=true;
   next();
 }
 
 function pickPair(){
-  let a,b,key;
-  let guard=0;
+  let a,b,key,guard=0;
   do{
     a=members[Math.floor(Math.random()*members.length)];
     b=members[Math.floor(Math.random()*members.length)];
@@ -96,13 +97,11 @@ function pickPair(){
   return shuffle([a,b]);
 }
 
-function next(){
-  if(round>=TOTAL){finish();return;}
-  round++;
+function renderRound(pair){
   $("round").textContent=`第 ${round} / ${TOTAL} 回`;
   $("bar").style.width=(round/TOTAL*100)+"%";
   $("choices").innerHTML="";
-  pickPair().forEach(m=>{
+  pair.forEach(m=>{
     const btn=document.createElement("button");
     btn.className="choice";
     btn.innerHTML=`
@@ -112,9 +111,61 @@ function next(){
       </div>
       <div class="name">${m[1]}</div>
       <div class="group">${m[0]}</div>`;
-    btn.onclick=()=>{wins.push(m);next();};
+    btn.onclick=()=>choose("one",m);
     $("choices").appendChild(btn);
   });
+  $("backBtn").disabled=history.length===0;
+}
+
+function next(){
+  if(round>=TOTAL){finish();return;}
+  round++;
+  const pair=pickPair();
+  history.push({round:round,pair:pair,winner:null,type:null});
+  renderRound(pair);
+}
+
+function choose(type,m){
+  const current=history[history.length-1];
+  current.type=type;
+  current.winner=m||null;
+
+  if(type==="one") wins.push(m);
+  if(type==="both"){
+    wins.push(current.pair[0],current.pair[1]);
+    bothCount++;
+  }
+  if(type==="unknown") unknownCount++;
+  next();
+}
+
+function goBack(){
+  if(!history.length) return;
+  const current=history.pop();
+
+  if(current.type==="one"){
+    const i=wins.lastIndexOf(current.winner);
+    if(i>=0) wins.splice(i,1);
+  }else if(current.type==="both"){
+    for(let j=0;j<2;j++){
+      const i=wins.lastIndexOf(current.pair[j]);
+      if(i>=0) wins.splice(i,1);
+    }
+    bothCount=Math.max(0,bothCount-1);
+  }else if(current.type==="unknown"){
+    unknownCount=Math.max(0,unknownCount-1);
+  }
+
+  round=current.round-1;
+
+  if(history.length){
+    const previous=history[history.length-1];
+    renderRound(previous.pair);
+  }else{
+    round=0;
+    $("backBtn").disabled=true;
+    next();
+  }
 }
 
 function finish(){
@@ -142,14 +193,17 @@ function finish(){
 
 $("startBtn").onclick=start;
 $("again").onclick=start;
+$("backBtn").onclick=goBack;
+$("bothBtn").onclick=()=>choose("both");
+$("unknownBtn").onclick=()=>choose("unknown");
+
 $("share").onclick=async()=>{
-  const text="私のイコノイジョイ好き顔♡9選が決まった！";
-  if(navigator.share){
-    try{await navigator.share({title:"イコノイジョイ 好き顔♡9選",text:text});}catch(e){}
-  }else{
-    try{await navigator.clipboard.writeText(text);alert("シェア文をコピーしたよ♡ 結果はスクショしてXへ！");}
-    catch(e){alert("結果をスクショしてXでシェアしてね♡");}
-  }
+  const names=[...$("resultList").querySelectorAll(".name")]
+    .map((e,i)=>`${i+1}位 ${e.textContent}`).join(" / ");
+  const text=`私のイコノイジョイ好き顔♡9選が決まった！\n${names}\n#イコノイジョイ好き顔9選`;
+  const shareUrl="https://wywg2tjyw7-art.github.io/ikonoi-joi-sukigao/";
+  const xUrl=`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
+  window.open(xUrl,"_blank","noopener,noreferrer");
 };
 </script>
 </body>
